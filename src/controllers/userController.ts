@@ -15,7 +15,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const userData = req.body as UserCreate;
 
     if (!userData.email || !userData.password || !userData.entity_id) {
-      res.status(400).json({ error: 'Campos obrigatórios: email, password, entity_id' });
+      res.status(400).json({ error: 'Required fields: email, password, entity_id' });
       return;
     }
 
@@ -23,7 +23,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json(user);
   } catch (err) {
     if ((err as Error).message.includes('Unique constraint')) {
-      res.status(409).json({ error: 'Email já está em uso' });
+      res.status(409).json({ error: 'Email already in use' });
     } else {
       res.status(400).json({ error: (err as Error).message });
     }
@@ -36,7 +36,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
     const user = await userService.getUserById(id);
     
     if (!user) {
-      res.status(404).json({ error: 'Usuário não encontrado' });
+      res.status(404).json({ error: 'User not found' });
       return;
     }
     
@@ -55,7 +55,7 @@ export const listUsersByEntity = async (req: RequestWithUser, res: Response): Pr
     } else if (req.user?.entityId) {
       entityId = req.user.entityId;
     } else {
-      res.status(400).json({ error: 'entity_id obrigatório' });
+      res.status(400).json({ error: 'entity_id is required' });
       return;
     }
 
@@ -83,7 +83,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const data = req.body as UserUpdate;
     
     if (data.entity_id) {
-      res.status(400).json({ error: 'Não é permitido alterar a entidade do usuário' });
+      res.status(400).json({ error: 'It is not allowed to change the user\'s entity' });
       return;
     }
     
@@ -91,9 +91,9 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     res.json(user);
   } catch (err) {
     if ((err as Error).message.includes('Record to update not found')) {
-      res.status(404).json({ error: 'Usuário não encontrado' });
+      res.status(404).json({ error: 'User not found' });
     } else if ((err as Error).message.includes('Unique constraint')) {
-      res.status(409).json({ error: 'Email já está em uso' });
+      res.status(409).json({ error: 'Email already in use' });
     } else {
       res.status(500).json({ error: (err as Error).message });
     }
@@ -107,7 +107,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     res.status(204).send();
   } catch (err) {
     if ((err as Error).message.includes('Record to update not found')) {
-      res.status(404).json({ error: 'Usuário não encontrado' });
+      res.status(404).json({ error: 'User not found' });
     } else {
       res.status(500).json({ error: (err as Error).message });
     }

@@ -6,7 +6,7 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: 'Voxly API',
       version: '1.0.0',
-      description: 'API de gerenciamento de entidades (clientes) e usuários (vendedores)',
+      description: 'Voxly API Docs',
     },
     components: {
       securitySchemes: {

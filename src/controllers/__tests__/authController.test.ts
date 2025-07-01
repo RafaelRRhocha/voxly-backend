@@ -49,7 +49,7 @@ describe('AuthController', () => {
       };
 
       mockRequest.body = loginData;
-      const error = new Error('Credenciais inválidas');
+      const error = new Error('Invalid credentials');
       jest.spyOn(authService, 'login').mockRejectedValue(error);
 
       await authController.login(mockRequest as Request, mockResponse as Response);
@@ -57,7 +57,7 @@ describe('AuthController', () => {
       expect(authService.login).toHaveBeenCalledWith(loginData);
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Credenciais inválidas'
+        error: 'Invalid credentials'
       });
     });
   });

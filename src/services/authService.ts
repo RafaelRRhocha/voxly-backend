@@ -15,10 +15,10 @@ export async function login(
     } 
   });
   
-  if (!user) throw new Error('Usuário não encontrado');
+  if (!user) throw new Error('User not found');
 
   const valid = await bcrypt.compare(data.password, user.password_hash);
-  if (!valid) throw new Error('Senha inválida');
+  if (!valid) throw new Error('Invalid password');
 
   const entity = await prisma.entity.findUnique({
     where: {
@@ -27,7 +27,7 @@ export async function login(
     }
   });
 
-  if (!entity) throw new Error('Entidade não encontrada ou inativa');
+  if (!entity) throw new Error('Entity not found or inactive');
 
   const payload: JwtPayload = {
     userId: user.id,

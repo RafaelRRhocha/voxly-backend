@@ -7,8 +7,8 @@ const router = Router();
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Autenticar usuário
- *     tags: [Autenticação]
+ *     summary: Authenticate user
+ *     tags: [Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -22,14 +22,14 @@ const router = Router();
  *               email:
  *                 type: string
  *                 format: email
- *                 description: Email do usuário
+ *                 description: User email
  *               password:
  *                 type: string
  *                 format: password
- *                 description: Senha do usuário
+ *                 description: User password
  *     responses:
  *       200:
- *         description: Login bem-sucedido
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
@@ -37,9 +37,9 @@ const router = Router();
  *               properties:
  *                 token:
  *                   type: string
- *                   description: Token JWT para autenticação
+ *                   description: JWT token for authentication
  *       401:
- *         description: Credenciais inválidas
+ *         description: Invalid credentials
  */
 router.post('/login', login);
 

@@ -20,26 +20,26 @@ const router = Router();
  *       properties:
  *         id:
  *           type: integer
- *           description: ID do usuário
+ *           description: User ID
  *         email:
  *           type: string
  *           format: email
- *           description: Email do usuário
+ *           description: User email
  *         entity_id:
  *           type: integer
- *           description: ID da entidade do usuário
+ *           description: User entity ID
  *         role:
  *           type: string
  *           enum: [ADMIN, USER]
- *           description: Papel do usuário no sistema
+ *           description: User role in the system
  */
 
 /**
  * @swagger
  * /api/users/register:
  *   post:
- *     summary: Registrar novo usuário
- *     tags: [Usuários]
+ *     summary: Register new user
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -63,11 +63,11 @@ const router = Router();
  *                 type: integer
  *     responses:
  *       201:
- *         description: Usuário criado com sucesso
+ *         description: User created successfully
  *       400:
- *         description: Dados inválidos
+ *         description: Invalid data
  *       409:
- *         description: Email já está em uso
+ *         description: Email already in use
  */
 router.post('/register', authenticate, requireAdmin, register);
 
@@ -75,13 +75,13 @@ router.post('/register', authenticate, requireAdmin, register);
  * @swagger
  * /api/users:
  *   get:
- *     summary: Listar usuários da entidade
- *     tags: [Usuários]
+ *     summary: List users by entity
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Lista de usuários
+ *         description: List of users
  *         content:
  *           application/json:
  *             schema:
@@ -95,8 +95,8 @@ router.get('/', authenticate, listUsersByEntity);
  * @swagger
  * /api/users/entity/{entityId}:
  *   get:
- *     summary: Buscar todos os usuários de uma entidade específica
- *     tags: [Usuários]
+ *     summary: Get all users by entity
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -105,10 +105,10 @@ router.get('/', authenticate, listUsersByEntity);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID da entidade
+ *         description: Entity ID
  *     responses:
  *       200:
- *         description: Lista de usuários da entidade
+ *         description: List of users by entity
  *         content:
  *           application/json:
  *             schema:
@@ -122,8 +122,8 @@ router.get('/entity/:entityId', authenticate, getAllUsersByEntity);
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Buscar usuário por ID
- *     tags: [Usuários]
+ *     summary: Get user by ID
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -132,19 +132,19 @@ router.get('/entity/:entityId', authenticate, getAllUsersByEntity);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID do usuário
+ *         description: User ID
  *     responses:
  *       200:
- *         description: Usuário encontrado
+ *         description: User found
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
  *       404:
- *         description: Usuário não encontrado
+ *         description: User not found
  *   put:
- *     summary: Atualizar usuário
- *     tags: [Usuários]
+ *     summary: Update user
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -153,7 +153,7 @@ router.get('/entity/:entityId', authenticate, getAllUsersByEntity);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID do usuário
+ *         description: User ID
  *     requestBody:
  *       required: true
  *       content:
@@ -169,12 +169,12 @@ router.get('/entity/:entityId', authenticate, getAllUsersByEntity);
  *                 format: password
  *     responses:
  *       200:
- *         description: Usuário atualizado
+ *         description: User updated
  *       404:
- *         description: Usuário não encontrado
+ *         description: User not found
  *   delete:
- *     summary: Excluir usuário
- *     tags: [Usuários]
+ *     summary: Delete user
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -183,12 +183,12 @@ router.get('/entity/:entityId', authenticate, getAllUsersByEntity);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID do usuário
+ *         description: User ID
  *     responses:
  *       204:
- *         description: Usuário excluído
+ *         description: User deleted
  *       404:
- *         description: Usuário não encontrado
+ *         description: User not found
  */
 router.get('/:id', authenticate, getUserById);
 router.put('/:id', authenticate, requireAdmin, updateUser);

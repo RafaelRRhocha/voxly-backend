@@ -69,7 +69,7 @@ describe('UserController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Campos obrigatórios: email, password, entity_id'
+        error: 'Required fields: email, password, entity_id'
       });
     });
 
@@ -89,7 +89,7 @@ describe('UserController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(409);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Email já está em uso'
+        error: 'Email already in use'
       });
     });
   });
@@ -122,7 +122,7 @@ describe('UserController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(404);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Usuário não encontrado'
+        error: 'User not found'
       });
     });
   });
@@ -155,7 +155,7 @@ describe('UserController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'entity_id obrigatório'
+        error: 'entity_id is required'
       });
     });
   });
@@ -194,7 +194,7 @@ describe('UserController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Não é permitido alterar a entidade do usuário'
+        error: 'It is not allowed to change the user\'s entity'
       });
     });
   });
@@ -220,7 +220,7 @@ describe('UserController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(404);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Usuário não encontrado'
+        error: 'User not found'
       });
     });
   });

@@ -6,7 +6,7 @@ import * as entityService from './entityService';
 export async function createUser(data: UserCreate): Promise<UserResponse> {
   const entityExists = await entityService.validateEntityExists(data.entity_id);
   if (!entityExists) {
-    throw new Error('Entidade não encontrada');
+    throw new Error('Entity not found');
   }
 
   const hashed = await bcrypt.hash(data.password, 10);
@@ -50,7 +50,7 @@ export async function getUserById(id: number): Promise<UserResponse | null> {
 export async function getUsersByEntityId(entityId: number): Promise<UserResponse[]> {
   const entityExists = await entityService.validateEntityExists(entityId);
   if (!entityExists) {
-    throw new Error('Entidade não encontrada');
+    throw new Error('Entity not found');
   }
 
   const users = await prisma.user.findMany({
@@ -79,7 +79,7 @@ export async function updateUser(
   if (data.entity_id) {
     const entityExists = await entityService.validateEntityExists(data.entity_id);
     if (!entityExists) {
-      throw new Error('Entidade não encontrada');
+      throw new Error('Entity not found');
     }
   }
   
