@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  manager
+  seller
+}
+
+model Entity {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  users      User[]
+
+  @@map("entities")
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  entity_id     Int
+  email         String        @unique
+  password_hash String
+  role          UserRole
+  created_at    DateTime      @default(now())
+  updated_at    DateTime?
+  deleted_at    DateTime?
+
+  entity        Entity        @relation(fields: [entity_id], references: [id])
+
+  @@map("users")
+}
