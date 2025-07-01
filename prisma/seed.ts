@@ -10,7 +10,7 @@ async function main() {
     },
   });
 
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+  const ADMIN_PASSWORD = process.env.JWT_SECRET || 'admin123';
   const adminPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
   const adminUser = await prisma.user.create({
     data: {
