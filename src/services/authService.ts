@@ -2,6 +2,7 @@ import prisma from '../lib/prisma';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { UserRole } from '../enums/user';
 import { 
   LoginRequest, 
   LoginResponse, 
@@ -41,7 +42,7 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
   const payload: JwtPayload = {
     userId: user.id,
     entityId: user.entity_id,
-    role: user.role,
+    role: user.role as UserRole,
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
@@ -77,14 +78,14 @@ export async function register(data: RegisterRequest): Promise<LoginResponse> {
       email: data.email,
       password_hash: passwordHash,
       entity_id: defaultEntity.id,
-      role: 'seller'
+      role: UserRole.SELLER
     }
   });
 
   const payload: JwtPayload = {
     userId: user.id,
     entityId: user.entity_id,
-    role: user.role,
+    role: user.role as UserRole,
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
@@ -138,7 +139,7 @@ export async function refreshToken(data: RefreshTokenRequest): Promise<LoginResp
   const payload: JwtPayload = {
     userId: user.id,
     entityId: user.entity_id,
-    role: user.role,
+    role: user.role as UserRole,
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });

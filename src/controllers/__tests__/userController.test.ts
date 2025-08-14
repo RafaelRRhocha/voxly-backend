@@ -10,7 +10,7 @@ interface RequestWithUser extends Request {
   user?: {
     id: number;
     entityId: number;
-    role: string;
+    role: UserRole;
   };
 }
 

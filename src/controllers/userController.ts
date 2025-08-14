@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserCreate, UserUpdate } from '../types/user';
+import { UserRole } from '../enums/user';
 
 interface RequestWithUser extends Request {
   user?: {
     id: number;
     entityId: number;
-    role: string;
+    role: UserRole;
   };
 }
 
