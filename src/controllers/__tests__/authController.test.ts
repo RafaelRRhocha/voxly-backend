@@ -9,6 +9,8 @@ import {
   ForgotPasswordRequest, 
   ResetPasswordRequest 
 } from '../../types/auth';
+import { UserRole } from '../../enums/user';
+import '../../types/express';
 
 jest.mock('../../services/authService');
 
@@ -122,7 +124,7 @@ describe('AuthController', () => {
     it('should return user profile successfully', async () => {
       const userProfile = { id: '1', email: 'test@example.com', name: 'Test User' };
 
-      (mockRequest as any).user = { id: 1 };
+      mockRequest.user = { id: 1, entityId: 1, role: UserRole.SELLER };
       jest.spyOn(authService, 'getProfile').mockResolvedValue(userProfile);
 
       await authController.profile(mockRequest as Request, mockResponse as Response);
@@ -132,7 +134,7 @@ describe('AuthController', () => {
     });
 
     it('should return 401 when user not authenticated', async () => {
-      (mockRequest as any).user = undefined;
+      mockRequest.user = undefined;
 
       await authController.profile(mockRequest as Request, mockResponse as Response);
 

@@ -1,3 +1,5 @@
+import { UserRole } from '../enums/user';
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -40,5 +42,5 @@ export interface UserProfile {
 export interface JwtPayload {
   userId: number;
   entityId: number;
-  role: string;
+  role: UserRole;
 } 

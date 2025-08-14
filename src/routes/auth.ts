@@ -53,7 +53,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Authenticate user with email and password
  *     tags: [Authentication]
@@ -93,7 +93,7 @@ router.post('/login', validateLogin, login);
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Create new user account
  *     tags: [Authentication]
@@ -137,7 +137,7 @@ router.post('/register', validateRegister, register);
 
 /**
  * @swagger
- * /api/auth/profile:
+ * /auth/profile:
  *   get:
  *     summary: Get authenticated user profile
  *     tags: [Authentication]
@@ -167,7 +167,7 @@ router.get('/profile', authenticate, profile);
 
 /**
  * @swagger
- * /api/auth/refresh:
+ * /auth/refresh:
  *   post:
  *     summary: Renew authentication token
  *     tags: [Authentication]
@@ -202,7 +202,7 @@ router.post('/refresh', validateRefreshToken, refreshToken);
 
 /**
  * @swagger
- * /api/auth/forgot-password:
+ * /auth/forgot-password:
  *   post:
  *     summary: Initiate password recovery process
  *     tags: [Authentication]
@@ -233,7 +233,7 @@ router.post('/forgot-password', validateForgotPassword, forgotPassword);
 
 /**
  * @swagger
- * /api/auth/reset-password:
+ * /auth/reset-password:
  *   post:
  *     summary: Set new password after recovery process
  *     tags: [Authentication]

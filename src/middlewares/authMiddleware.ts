@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from '../types/auth';
 import { UserRole } from '../enums/user';
+import '../types/express';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
@@ -16,10 +17,10 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
   try {
     const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
-    (req as any).user = {
+    req.user = {
       id: payload.userId,
       entityId: payload.entityId,
-      role: payload.role,
+      role: payload.role as UserRole,
     };
     next();
   } catch {
@@ -29,7 +30,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
 export const requireRole = (role: UserRole) => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    if (!(req as any).user || (req as any).user.role !== role) {
+    if (!req.user || req.user.role !== role) {
       res.status(403).json({ error: 'Access restricted' });
       return;
     }

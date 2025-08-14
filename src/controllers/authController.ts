@@ -11,6 +11,7 @@ import {
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const loginData: LoginRequest = req.body;
+
     const result = await authService.login(loginData);
     res.json(result);
   } catch (err) {
@@ -30,8 +31,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
 export const profile = async (req: Request, res: Response): Promise<void> => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (req as any).user?.id;
+    const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ error: 'User not authenticated' });
       return;
