@@ -28,9 +28,12 @@ model Entity {
 model User {
   id            Int           @id @default(autoincrement())
   entity_id     Int
+  name          String
   email         String        @unique
   password_hash String
   role          UserRole
+  reset_token   String?
+  reset_token_expires DateTime?
   created_at    DateTime      @default(now())
   updated_at    DateTime?
   deleted_at    DateTime?

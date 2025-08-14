@@ -37,6 +37,7 @@ describe('UserController', () => {
   describe('register', () => {
     it('should create a user successfully', async () => {
       const userData: UserCreate = {
+        name: 'Test User',
         email: 'test@example.com',
         password: 'password123',
         entity_id: 1,
@@ -45,6 +46,7 @@ describe('UserController', () => {
 
       const createdUser: UserResponse = {
         id: 1,
+        name: 'Test User',
         email: 'test@example.com',
         entity_id: 1,
         role: UserRole.SELLER,
@@ -69,12 +71,13 @@ describe('UserController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Required fields: email, password, entity_id'
+        error: 'Required fields: name, email, password, entity_id'
       });
     });
 
     it('should return 409 when email is already in use', async () => {
       const userData: UserCreate = {
+        name: 'Test User',
         email: 'test@example.com',
         password: 'password123',
         entity_id: 1,
@@ -98,6 +101,7 @@ describe('UserController', () => {
     it('should return user when found', async () => {
       const user: UserResponse = {
         id: 1,
+        name: 'Test User',
         email: 'test@example.com',
         entity_id: 1,
         role: UserRole.SELLER,
@@ -131,6 +135,7 @@ describe('UserController', () => {
     it('should return users when entity_id is provided in query', async () => {
       const users: UserResponse[] = [{
         id: 1,
+        name: 'Test User',
         email: 'test@example.com',
         entity_id: 1,
         role: UserRole.SELLER,
@@ -169,6 +174,7 @@ describe('UserController', () => {
 
       const updatedUser: UserResponse = {
         id: 1,
+        name: 'Test User',
         email: 'updated@example.com',
         entity_id: 1,
         role: UserRole.MANAGER,

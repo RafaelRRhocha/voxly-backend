@@ -14,8 +14,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = req.body as UserCreate;
 
-    if (!userData.email || !userData.password || !userData.entity_id) {
-      res.status(400).json({ error: 'Required fields: email, password, entity_id' });
+    if (!userData.email || !userData.password || !userData.entity_id || !userData.name) {
+      res.status(400).json({ error: 'Required fields: name, email, password, entity_id' });
       return;
     }
 

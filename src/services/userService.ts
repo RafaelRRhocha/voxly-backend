@@ -13,6 +13,7 @@ export async function createUser(data: UserCreate): Promise<UserResponse> {
 
   const user = await prisma.user.create({
     data: {
+      name: data.name,
       email: data.email,
       password_hash: hashed,
       entity_id: data.entity_id,
@@ -22,6 +23,7 @@ export async function createUser(data: UserCreate): Promise<UserResponse> {
 
   return {
     id: user.id,
+    name: user.name,
     email: user.email,
     entity_id: user.entity_id,
     role: user.role,
@@ -39,6 +41,7 @@ export async function getUserById(id: number): Promise<UserResponse | null> {
 
   return {
     id: user.id,
+    name: user.name,
     email: user.email,
     entity_id: user.entity_id,
     role: user.role,
@@ -62,6 +65,7 @@ export async function getUsersByEntityId(entityId: number): Promise<UserResponse
 
   return users.map(user => ({
     id: user.id,
+    name: user.name,
     email: user.email,
     entity_id: user.entity_id,
     role: user.role,
@@ -98,6 +102,7 @@ export async function updateUser(
 
   return {
     id: user.id,
+    name: user.name,
     email: user.email,
     entity_id: user.entity_id,
     role: user.role,

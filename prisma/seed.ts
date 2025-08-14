@@ -14,6 +14,7 @@ async function main() {
   const adminPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
   const adminUser = await prisma.user.create({
     data: {
+      name: 'Administrator',
       email: 'admin@voxly.com',
       password_hash: adminPassword,
       entity_id: adminEntity.id,
@@ -35,6 +36,7 @@ async function main() {
   const demoPassword = await bcrypt.hash('demo123', 10);
   const demoUser = await prisma.user.create({
     data: {
+      name: 'Demo User',
       email: 'demo@voxly.com',
       password_hash: demoPassword,
       entity_id: demoEntity.id,

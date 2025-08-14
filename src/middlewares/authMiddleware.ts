@@ -16,7 +16,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
   try {
     const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
-    req.body.user = {
+    (req as any).user = {
       id: payload.userId,
       entityId: payload.entityId,
       role: payload.role,
@@ -29,7 +29,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
 export const requireRole = (role: UserRole) => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    if (!req.body.user || req.body.user.role !== role) {
+    if (!(req as any).user || (req as any).user.role !== role) {
       res.status(403).json({ error: 'Access restricted' });
       return;
     }
