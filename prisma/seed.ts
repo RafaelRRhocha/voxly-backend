@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient, SurveyType, UserRole } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -48,6 +48,69 @@ async function main() {
     entity: demoEntity,
     user: { ...demoUser, password_hash: '[HIDDEN]' },
   });
+
+  const store = await prisma.store.create({
+    data: {
+      name: 'Store 1',
+      entity_id: demoEntity.id,
+    },
+  });
+  console.log('Store created:', store);
+
+  const seller = await prisma.seller.create({
+    data: {
+      name: 'Seller 1',
+      store_id: store.id,
+    },
+  });
+  console.log('Seller created:', seller);
+
+  const seller2 = await prisma.seller.create({
+    data: {
+      name: 'Seller 2',
+      store_id: store.id,
+    },
+  });
+  console.log('Seller created:', seller2);
+
+  const survey = await prisma.survey.create({
+    data: {
+      name: 'Survey 1',
+      type: SurveyType.nps,
+      seller_id: seller.id,
+      created_by: demoUser.id,
+    },
+  });
+  console.log('Survey created:', survey);
+
+  const survey2 = await prisma.survey.create({
+    data: {
+      name: 'Survey 2',
+      type: SurveyType.nps,
+      seller_id: seller2.id,
+      created_by: demoUser.id,
+    },
+  });
+  console.log('Survey created:', survey2);
+
+  const surveyResponse = await prisma.surveyResponse.createMany({
+    data: [{
+      survey_id: survey.id,
+      score: 5,
+      comment: 'This is a comment 1',
+    },
+    {
+      survey_id: survey.id,
+      score: 5,
+      comment: 'This is a comment 2',
+    },
+    {
+      survey_id: survey2.id,
+      score: 5,
+      comment: 'This is a comment 3',
+    }]
+  });
+  console.log('Survey Responses created:', surveyResponse);
 }
 
 main()

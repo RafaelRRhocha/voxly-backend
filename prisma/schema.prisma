@@ -13,6 +13,15 @@ enum UserRole {
   seller
 }
 
+enum SurveyType {
+  nps
+  csat
+  likert
+  emoji
+  thumbs
+  custom
+}
+
 model Entity {
   id         Int       @id @default(autoincrement())
   name       String    @unique
@@ -20,25 +29,94 @@ model Entity {
   updated_at DateTime?
   deleted_at DateTime?
 
-  users      User[]
+  users  User[]
+  stores Store[]
 
   @@map("entities")
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
-  entity_id     Int
-  name          String
-  email         String        @unique
-  password_hash String
-  role          UserRole
-  reset_token   String?
+  id                  Int       @id @default(autoincrement())
+  entity_id           Int
+  name                String
+  email               String    @unique
+  password_hash       String
+  role                UserRole
+  reset_token         String?
   reset_token_expires DateTime?
-  created_at    DateTime      @default(now())
+  created_at          DateTime  @default(now())
+  updated_at          DateTime?
+  deleted_at          DateTime?
+
+  entity Entity @relation(fields: [entity_id], references: [id])
+
+  surveys Survey[]
+
+  @@map("users")
+}
+
+model Store {
+  id         Int       @id @default(autoincrement())
+  entity_id  Int
+  name       String    @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  entity Entity @relation(fields: [entity_id], references: [id])
+
+  sellers Seller[]
+
+  @@map("store")
+}
+
+model Seller {
+  id         Int       @id @default(autoincrement())
+  store_id   Int
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  store Store @relation(fields: [store_id], references: [id])
+
+  surveys Survey[]
+
+  @@map("seller")
+}
+
+model Survey {
+  id            Int        @id @default(autoincrement())
+  seller_id     Int
+  created_by    Int
+  name          String
+  type          SurveyType
+  scale_min     Int        @default(1)
+  scale_max     Int        @default(10)
+  allow_comment Boolean    @default(true)
+  is_active     Boolean    @default(true)
+  created_at    DateTime   @default(now())
   updated_at    DateTime?
   deleted_at    DateTime?
 
-  entity        Entity        @relation(fields: [entity_id], references: [id])
+  seller Seller @relation(fields: [seller_id], references: [id])
+  owner  User   @relation(fields: [created_by], references: [id])
 
-  @@map("users")
+  responses SurveyResponse[]
+
+  @@map("survey")
+}
+
+model SurveyResponse {
+  id         Int       @id @default(autoincrement())
+  survey_id  Int
+  score      Int
+  comment    String?
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  survey Survey @relation(fields: [survey_id], references: [id])
+
+  @@map("survey_response")
 }
