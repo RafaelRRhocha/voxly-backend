@@ -11,6 +11,7 @@ import {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   UserProfile,
+  UpdateProfileRequest,
   JwtPayload 
 } from '../types/auth';
 
@@ -203,4 +204,51 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<void> {
       reset_token_expires: null
     }
   });
+}
+
+export async function updateProfile(userId: number, data: UpdateProfileRequest): Promise<UserProfile> {
+  const updateData: Record<string, unknown> = {};
+
+  if (data.name !== undefined) {
+    updateData.name = data.name;
+  }
+
+  if (data.email !== undefined) {
+    const existingUser = await prisma.user.findUnique({
+      where: { 
+        email: data.email,
+        deleted_at: null
+      }
+    });
+
+    if (existingUser && existingUser.id !== userId) {
+      throw new Error('Email already in use');
+    }
+
+    updateData.email = data.email;
+  }
+
+  if (data.password !== undefined) {
+    updateData.password_hash = await bcrypt.hash(data.password, SALT_ROUNDS);
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    throw new Error('No fields to update');
+  }
+
+  updateData.updated_at = new Date();
+
+  const user = await prisma.user.update({
+    where: { 
+      id: userId,
+      deleted_at: null
+    },
+    data: updateData,
+  });
+
+  return {
+    id: user.id.toString(),
+    email: user.email,
+    name: user.name
+  };
 }

@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import * as authService from '../services/authService';
 import { 
   LoginRequest, 
-  RegisterRequest, 
   RefreshTokenRequest, 
   ForgotPasswordRequest, 
-  ResetPasswordRequest 
+  ResetPasswordRequest,
+  UpdateProfileRequest 
 } from '../types/auth';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
@@ -16,16 +16,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.json(result);
   } catch (err) {
     res.status(401).json({ error: (err as Error).message });
-  }
-};
-
-export const register = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const registerData: RegisterRequest = req.body;
-    const result = await authService.register(registerData);
-    res.status(201).json(result);
-  } catch (err) {
-    res.status(400).json({ error: (err as Error).message });
   }
 };
 
@@ -70,5 +60,27 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     res.status(204).send();
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    const updateData: UpdateProfileRequest = req.body;
+    const result = await authService.updateProfile(userId, updateData);
+    res.json(result);
+  } catch (err) {
+    if ((err as Error).message.includes('Email already in use')) {
+      res.status(409).json({ error: (err as Error).message });
+    } else if ((err as Error).message.includes('No fields to update')) {
+      res.status(400).json({ error: (err as Error).message });
+    } else {
+      res.status(500).json({ error: (err as Error).message });
+    }
   }
 };

@@ -78,3 +78,9 @@ export const validateResetPassword = validateRequest([
   { field: 'token', required: true, type: 'string', minLength: 1 },
   { field: 'password', required: true, type: 'string', minLength: 6 }
 ]);
+
+export const validateUpdateProfile = validateRequest([
+  { field: 'name', required: false, type: 'string', minLength: 2, maxLength: 100 },
+  { field: 'email', required: false, type: 'email' },
+  { field: 'password', required: false, type: 'string', minLength: 6 }
+]);

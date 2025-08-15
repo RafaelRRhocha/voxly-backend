@@ -39,6 +39,12 @@ export interface UserProfile {
   name: string;
 }
 
+export interface UpdateProfileRequest {
+  name?: string;
+  email?: string;
+  password?: string;
+}
+
 export interface JwtPayload {
   userId: number;
   entityId: number;

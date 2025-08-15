@@ -67,7 +67,7 @@ model Store {
 
   sellers Seller[]
 
-  @@map("store")
+  @@map("stores")
 }
 
 model Seller {
@@ -82,7 +82,7 @@ model Seller {
 
   surveys Survey[]
 
-  @@map("seller")
+  @@map("sellers")
 }
 
 model Survey {
@@ -104,7 +104,7 @@ model Survey {
 
   responses SurveyResponse[]
 
-  @@map("survey")
+  @@map("surveys")
 }
 
 model SurveyResponse {
@@ -118,5 +118,5 @@ model SurveyResponse {
 
   survey Survey @relation(fields: [survey_id], references: [id])
 
-  @@map("survey_response")
+  @@map("survey_responses")
 }

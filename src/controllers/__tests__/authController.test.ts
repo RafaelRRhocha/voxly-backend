@@ -3,11 +3,12 @@ import * as authService from '../../services/authService';
 import * as authController from '../authController';
 import { 
   LoginRequest, 
-  LoginResponse, 
-  RegisterRequest, 
+  LoginResponse,
   RefreshTokenRequest, 
   ForgotPasswordRequest, 
-  ResetPasswordRequest 
+  ResetPasswordRequest,
+  UpdateProfileRequest,
+  UserProfile
 } from '../../types/auth';
 import { UserRole } from '../../enums/user';
 import '../../types/express';
@@ -76,46 +77,108 @@ describe('AuthController', () => {
     });
   });
 
-  describe('register', () => {
-    it('should register successfully', async () => {
-      const registerData: RegisterRequest = {
+  describe('updateProfile', () => {
+    it('should update profile successfully', async () => {
+      const updateData: UpdateProfileRequest = {
         email: 'test@example.com',
         password: 'password123',
         name: 'Test User',
       };
 
-      const registerResponse: LoginResponse = {
-        user: { id: '1', email: 'test@example.com', name: 'Test User' },
-        token: 'jwt-token',
+      const updateResponse: UserProfile = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
       };
 
-      mockRequest.body = registerData;
-      jest.spyOn(authService, 'register').mockResolvedValue(registerResponse);
+      mockRequest.body = updateData;
+      mockRequest.user = { id: 1, entityId: 1, role: UserRole.SELLER };
+      jest.spyOn(authService, 'updateProfile').mockResolvedValue(updateResponse);
 
-      await authController.register(mockRequest as Request, mockResponse as Response);
+      await authController.updateProfile(mockRequest as Request, mockResponse as Response);
 
-      expect(authService.register).toHaveBeenCalledWith(registerData);
-      expect(mockResponse.status).toHaveBeenCalledWith(201);
-      expect(mockResponse.json).toHaveBeenCalledWith(registerResponse);
+      expect(authService.updateProfile).toHaveBeenCalledWith(1, updateData);
+      expect(mockResponse.json).toHaveBeenCalledWith(updateResponse);
     });
 
-    it('should return 400 when registration fails', async () => {
-      const registerData: RegisterRequest = {
+    it('should return 401 when user not authenticated', async () => {
+      const updateData: UpdateProfileRequest = {
         email: 'test@example.com',
         password: 'password123',
         name: 'Test User',
       };
 
-      mockRequest.body = registerData;
-      const error = new Error('Email already registered');
-      jest.spyOn(authService, 'register').mockRejectedValue(error);
+      mockRequest.body = updateData;
+      mockRequest.user = undefined;
 
-      await authController.register(mockRequest as Request, mockResponse as Response);
+      await authController.updateProfile(mockRequest as Request, mockResponse as Response);
 
-      expect(authService.register).toHaveBeenCalledWith(registerData);
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'User not authenticated'
+      });
+    });
+
+    it('should return 400 when no fields to update', async () => {
+      const updateData: UpdateProfileRequest = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+      };
+
+      mockRequest.body = updateData;
+      mockRequest.user = { id: 1, entityId: 1, role: UserRole.SELLER };
+      const error = new Error('No fields to update');
+      jest.spyOn(authService, 'updateProfile').mockRejectedValue(error);
+
+      await authController.updateProfile(mockRequest as Request, mockResponse as Response);
+
+      expect(authService.updateProfile).toHaveBeenCalledWith(1, updateData);
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Email already registered'
+        error: 'No fields to update'
+      });
+    });
+
+    it('should return 409 when email already in use', async () => {
+      const updateData: UpdateProfileRequest = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+      };
+
+      mockRequest.body = updateData;
+      mockRequest.user = { id: 1, entityId: 1, role: UserRole.SELLER };
+      const error = new Error('Email already in use');
+      jest.spyOn(authService, 'updateProfile').mockRejectedValue(error);
+
+      await authController.updateProfile(mockRequest as Request, mockResponse as Response);
+
+      expect(authService.updateProfile).toHaveBeenCalledWith(1, updateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(409);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Email already in use'
+      });
+    });
+
+    it('should return 500 for other errors', async () => {
+      const updateData: UpdateProfileRequest = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+      };
+
+      mockRequest.body = updateData;
+      mockRequest.user = { id: 1, entityId: 1, role: UserRole.SELLER };
+      const error = new Error('Database connection error');
+      jest.spyOn(authService, 'updateProfile').mockRejectedValue(error);
+
+      await authController.updateProfile(mockRequest as Request, mockResponse as Response);
+
+      expect(authService.updateProfile).toHaveBeenCalledWith(1, updateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Database connection error'
       });
     });
   });
