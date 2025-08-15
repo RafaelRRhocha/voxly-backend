@@ -21,7 +21,8 @@ export interface UserResponse {
   id: number;
   name: string;
   email: string;
-  entity_id: number;
+  entityId: number;
+  entityName: string;
   role: string;
   created_at: Date;
   updated_at: Date | null;

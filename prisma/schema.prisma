@@ -19,7 +19,6 @@ enum SurveyType {
   likert
   emoji
   thumbs
-  custom
 }
 
 model Entity {

@@ -37,6 +37,8 @@ export interface UserProfile {
   id: string;
   email: string;
   name: string;
+  entityName: string;
+  entityId: number;
 }
 
 export interface UpdateProfileRequest {

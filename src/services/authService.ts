@@ -103,18 +103,26 @@ export async function register(data: RegisterRequest): Promise<LoginResponse> {
 
 export async function getProfile(userId: number): Promise<UserProfile> {
   const user = await prisma.user.findUnique({
-    where: { 
+    where: {
       id: userId,
       deleted_at: null 
     }
   });
 
-  if (!user) throw new Error('User not found');
+  const entity = await prisma.entity.findUnique({
+    where: {
+      id: user?.entity_id,
+      deleted_at: null
+    }
+  });
+
+  if (!user || !entity) throw new Error('User or Entity not found');
 
   return {
+    ...user,
+    entityName: entity.name,
+    entityId: entity.id,
     id: user.id.toString(),
-    email: user.email,
-    name: user.name
   };
 }
 
@@ -246,9 +254,20 @@ export async function updateProfile(userId: number, data: UpdateProfileRequest):
     data: updateData,
   });
 
+  const entity = await prisma.entity.findUnique({
+    where: {
+      id: user.entity_id,
+      deleted_at: null
+    }
+  });
+
+  if (!entity) throw new Error('Entity not found');
+
   return {
     id: user.id.toString(),
     email: user.email,
-    name: user.name
+    name: user.name,
+    entityName: entity.name,
+    entityId: entity.id,
   };
 }

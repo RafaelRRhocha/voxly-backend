@@ -21,11 +21,20 @@ export async function createUser(data: UserCreate): Promise<UserResponse> {
     },
   });
 
+  const entity = await prisma.entity.findUnique({
+    where: { id: user.entity_id },
+  });
+
+  if (!entity) {
+    throw new Error('Entity not found');
+  }
+
   return {
     id: user.id,
     name: user.name,
     email: user.email,
-    entity_id: user.entity_id,
+    entityId: user.entity_id,
+    entityName: entity.name,
     role: user.role,
     created_at: user.created_at,
     updated_at: user.updated_at,
@@ -39,11 +48,20 @@ export async function getUserById(id: number): Promise<UserResponse | null> {
 
   if (!user) return null;
 
+  const entity = await prisma.entity.findUnique({
+    where: { id: user.entity_id },
+  });
+
+  if (!entity) {
+    throw new Error('Entity not found');
+  }
+
   return {
     id: user.id,
     name: user.name,
     email: user.email,
-    entity_id: user.entity_id,
+    entityId: user.entity_id,
+    entityName: entity.name,
     role: user.role,
     created_at: user.created_at,
     updated_at: user.updated_at,
@@ -63,11 +81,20 @@ export async function getUsersByEntityId(entityId: number): Promise<UserResponse
     },
   });
 
+  const entity = await prisma.entity.findUnique({
+    where: { id: entityId },
+  });
+
+  if (!entity) {
+    throw new Error('Entity not found');
+  }
+
   return users.map(user => ({
     id: user.id,
     name: user.name,
     email: user.email,
-    entity_id: user.entity_id,
+    entityId: user.entity_id,
+    entityName: entity.name,
     role: user.role,
     created_at: user.created_at,
     updated_at: user.updated_at,
@@ -100,11 +127,20 @@ export async function updateUser(
     },
   });
 
+  const entity = await prisma.entity.findUnique({
+    where: { id: user.entity_id },
+  });
+
+  if (!entity) {
+    throw new Error('Entity not found');
+  }
+
   return {
     id: user.id,
     name: user.name,
     email: user.email,
-    entity_id: user.entity_id,
+    entityId: user.entity_id,
+    entityName: entity.name,
     role: user.role,
     created_at: user.created_at,
     updated_at: user.updated_at,

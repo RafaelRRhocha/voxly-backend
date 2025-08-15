@@ -89,6 +89,8 @@ describe('AuthController', () => {
         id: '1',
         email: 'test@example.com',
         name: 'Test User',
+        entityName: 'Test Entity',
+        entityId: 1,
       };
 
       mockRequest.body = updateData;
@@ -185,7 +187,7 @@ describe('AuthController', () => {
 
   describe('profile', () => {
     it('should return user profile successfully', async () => {
-      const userProfile = { id: '1', email: 'test@example.com', name: 'Test User' };
+      const userProfile = { id: '1', email: 'test@example.com', name: 'Test User', entityName: 'Test Entity', entityId: 1 };
 
       mockRequest.user = { id: 1, entityId: 1, role: UserRole.SELLER };
       jest.spyOn(authService, 'getProfile').mockResolvedValue(userProfile);
