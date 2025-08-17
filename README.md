@@ -17,37 +17,24 @@ Consulte o arquivo `prisma/schema.prisma` para ver o modelo de dados atualizado 
 
 ## Pré-requisitos
 
-- Node.js (versão LTS recomendada)
-- MySQL Server
-- NPM ou Yarn
+- Docker e suas dependências
 
 ## Instalação
 
 1. Clone o repositório
-2. Instale as dependências:
 
-```bash
-npm install
-```
-
-3. Configure as variáveis de ambiente copiando o arquivo de exemplo:
+2. Configure as variáveis de ambiente copiando o arquivo de exemplo:
 
 ```bash
 cp .env.example .env
 ```
 
-4. Configure as variáveis no arquivo `.env` de acordo com seu ambiente
+3. Configure as variáveis no arquivo `.env` na raiz do projeto de acordo com seu ambiente
 
-5. Execute as migrações do banco de dados:
-
-```bash
-npm run prisma:migrate
-```
-
-6. Gere os tipos do Prisma:
+4. Inicie os conteiners do Docker compose:
 
 ```bash
-npm run prisma:generate
+docker compose up --watch
 ```
 
 ## Documentação da API

@@ -1,0 +1,59 @@
+services:
+  api:
+    build: .
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - /usr/src/app/node_modules
+      - ./prisma/migrations:/usr/src/app/prisma/migrations
+    command: >
+      sh -c "
+        if [ -d prisma/migrations ] && [ \"$(ls -A prisma/migrations)\" ]; then
+          echo 'Running prisma migrate deploy...';
+          npx prisma migrate deploy;
+        else
+          echo 'No migrations found, running first time prisma setup...';
+          npx prisma generate &&
+          npx prisma migrate dev --name init &&
+          npx prisma db seed;
+        fi &&
+        npm run dev
+      "
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /usr/src/app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+        - action: sync+restart
+          path: src/app.ts
+          target: /usr/src/app/src/app.ts
+
+  db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -p$MYSQL_ROOT_PASSWORD || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:
