@@ -1,12 +1,13 @@
-import { Request, Response } from 'express';
-import * as authService from '../services/authService';
-import { 
-  LoginRequest, 
-  RefreshTokenRequest, 
-  ForgotPasswordRequest, 
+import { Request, Response } from "express";
+
+import * as authService from "../services/authService";
+import {
+  ForgotPasswordRequest,
+  LoginRequest,
+  RefreshTokenRequest,
   ResetPasswordRequest,
-  UpdateProfileRequest 
-} from '../types/auth';
+  UpdateProfileRequest,
+} from "../types/auth";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -23,7 +24,7 @@ export const profile = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
+      res.status(401).json({ error: "User not authenticated" });
       return;
     }
     const result = await authService.getProfile(userId);
@@ -33,7 +34,10 @@ export const profile = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const refreshToken = async (req: Request, res: Response): Promise<void> => {
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const refreshData: RefreshTokenRequest = req.body;
     const result = await authService.refreshToken(refreshData);
@@ -43,7 +47,10 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const forgotData: ForgotPasswordRequest = req.body;
     await authService.forgotPassword(forgotData);
@@ -53,7 +60,10 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const resetData: ResetPasswordRequest = req.body;
     await authService.resetPassword(resetData);
@@ -63,11 +73,14 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
+      res.status(401).json({ error: "User not authenticated" });
       return;
     }
 
@@ -75,9 +88,9 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     const result = await authService.updateProfile(userId, updateData);
     res.json(result);
   } catch (err) {
-    if ((err as Error).message.includes('Email already in use')) {
+    if ((err as Error).message.includes("Email already in use")) {
       res.status(409).json({ error: (err as Error).message });
-    } else if ((err as Error).message.includes('No fields to update')) {
+    } else if ((err as Error).message.includes("No fields to update")) {
       res.status(400).json({ error: (err as Error).message });
     } else {
       res.status(500).json({ error: (err as Error).message });

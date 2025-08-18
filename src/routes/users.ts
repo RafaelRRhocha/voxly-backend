@@ -1,12 +1,13 @@
-import { Router } from 'express';
-import { 
-  register, 
-  getUserById, 
-  updateUser, 
+import { Router } from "express";
+
+import {
   deleteUser,
-  getAllUsersByEntity
-} from '../controllers/userController';
-import { authenticate, requireAdmin } from '../middlewares/authMiddleware';
+  getAllUsersByEntity,
+  getUserById,
+  register,
+  updateUser,
+} from "../controllers/userController";
+import { authenticate, requireAdmin } from "../middlewares/authMiddleware";
 
 const router = Router();
 
@@ -70,7 +71,7 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/entity/:entityId', authenticate, getAllUsersByEntity);
+router.get("/entity/:entityId", authenticate, getAllUsersByEntity);
 
 /**
  * @swagger
@@ -161,9 +162,9 @@ router.get('/entity/:entityId', authenticate, getAllUsersByEntity);
  *       404:
  *         description: User not found
  */
-router.get('/:id', authenticate, getUserById);
-router.put('/:id', authenticate, requireAdmin, updateUser);
-router.delete('/:id', authenticate, requireAdmin, deleteUser);
+router.get("/:id", authenticate, getUserById);
+router.put("/:id", authenticate, requireAdmin, updateUser);
+router.delete("/:id", authenticate, requireAdmin, deleteUser);
 
 /**
  * @swagger
@@ -216,6 +217,6 @@ router.delete('/:id', authenticate, requireAdmin, deleteUser);
  *       409:
  *         description: Email already in use
  */
-router.post('/register', authenticate, requireAdmin, register);
+router.post("/register", authenticate, requireAdmin, register);
 
 export default router;

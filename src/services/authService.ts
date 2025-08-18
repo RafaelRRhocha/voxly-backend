@@ -1,44 +1,45 @@
-import prisma from '../lib/prisma';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import { UserRole } from '../enums/user';
-import { 
-  LoginRequest, 
-  LoginResponse, 
-  RegisterRequest,
-  RefreshTokenRequest,
-  ForgotPasswordRequest,
-  ResetPasswordRequest,
-  UserProfile,
-  UpdateProfileRequest,
-  JwtPayload 
-} from '../types/auth';
+import bcrypt from "bcrypt";
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+import { UserRole } from "../enums/user";
+import prisma from "../lib/prisma";
+import {
+  ForgotPasswordRequest,
+  JwtPayload,
+  LoginRequest,
+  LoginResponse,
+  RefreshTokenRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+  UpdateProfileRequest,
+  UserProfile,
+} from "../types/auth";
+
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
 const SALT_ROUNDS = 10;
 
 export async function login(data: LoginRequest): Promise<LoginResponse> {
-  const user = await prisma.user.findUnique({ 
-    where: { 
+  const user = await prisma.user.findUnique({
+    where: {
       email: data.email,
-      deleted_at: null
-    } 
+      deleted_at: null,
+    },
   });
-  
-  if (!user) throw new Error('Invalid credentials');
+
+  if (!user) throw new Error("Invalid credentials");
 
   const valid = await bcrypt.compare(data.password, user.password_hash);
-  if (!valid) throw new Error('Invalid credentials');
+  if (!valid) throw new Error("Invalid credentials");
 
   const entity = await prisma.entity.findUnique({
     where: {
       id: user.entity_id,
-      deleted_at: null
-    }
+      deleted_at: null,
+    },
   });
 
-  if (!entity) throw new Error('Entity not found or inactive');
+  if (!entity) throw new Error("Entity not found or inactive");
 
   const payload: JwtPayload = {
     userId: user.id,
@@ -46,30 +47,32 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
     role: user.role as UserRole,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
 
-  return { 
+  return {
     user: {
       id: user.id.toString(),
       email: user.email,
-      name: user.name
+      name: user.name,
+      entityId: user.entity_id,
+      role: user.role as UserRole,
     },
-    token 
+    token,
   };
 }
 
 export async function register(data: RegisterRequest): Promise<LoginResponse> {
   const existingUser = await prisma.user.findUnique({
-    where: { email: data.email }
+    where: { email: data.email },
   });
 
-  if (existingUser) throw new Error('Email already registered');
+  if (existingUser) throw new Error("Email already registered");
 
   const defaultEntity = await prisma.entity.findFirst({
-    where: { deleted_at: null }
+    where: { deleted_at: null },
   });
 
-  if (!defaultEntity) throw new Error('No entity available for registration');
+  if (!defaultEntity) throw new Error("No entity available for registration");
 
   const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
 
@@ -79,8 +82,8 @@ export async function register(data: RegisterRequest): Promise<LoginResponse> {
       email: data.email,
       password_hash: passwordHash,
       entity_id: defaultEntity.id,
-      role: UserRole.SELLER
-    }
+      role: UserRole.SELLER,
+    },
   });
 
   const payload: JwtPayload = {
@@ -89,15 +92,17 @@ export async function register(data: RegisterRequest): Promise<LoginResponse> {
     role: user.role as UserRole,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
 
   return {
     user: {
       id: user.id.toString(),
       email: user.email,
-      name: user.name
+      name: user.name,
+      role: user.role as UserRole,
+      entityId: user.entity_id,
     },
-    token
+    token,
   };
 }
 
@@ -105,18 +110,18 @@ export async function getProfile(userId: number): Promise<UserProfile> {
   const user = await prisma.user.findUnique({
     where: {
       id: userId,
-      deleted_at: null 
-    }
+      deleted_at: null,
+    },
   });
 
   const entity = await prisma.entity.findUnique({
     where: {
       id: user?.entity_id,
-      deleted_at: null
-    }
+      deleted_at: null,
+    },
   });
 
-  if (!user || !entity) throw new Error('User or Entity not found');
+  if (!user || !entity) throw new Error("User or Entity not found");
 
   return {
     ...user,
@@ -126,24 +131,26 @@ export async function getProfile(userId: number): Promise<UserProfile> {
   };
 }
 
-export async function refreshToken(data: RefreshTokenRequest): Promise<LoginResponse> {
+export async function refreshToken(
+  data: RefreshTokenRequest,
+): Promise<LoginResponse> {
   const user = await prisma.user.findUnique({
-    where: { 
+    where: {
       email: data.email,
-      deleted_at: null 
-    }
+      deleted_at: null,
+    },
   });
 
-  if (!user) throw new Error('User not found');
+  if (!user) throw new Error("User not found");
 
   const entity = await prisma.entity.findUnique({
     where: {
       id: user.entity_id,
-      deleted_at: null
-    }
+      deleted_at: null,
+    },
   });
 
-  if (!entity) throw new Error('Entity not found or inactive');
+  if (!entity) throw new Error("Entity not found or inactive");
 
   const payload: JwtPayload = {
     userId: user.id,
@@ -151,39 +158,43 @@ export async function refreshToken(data: RefreshTokenRequest): Promise<LoginResp
     role: user.role as UserRole,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
 
   return {
     user: {
       id: user.id.toString(),
       email: user.email,
-      name: user.name
+      name: user.name,
+      role: user.role as UserRole,
+      entityId: user.entity_id,
     },
-    token
+    token,
   };
 }
 
-export async function forgotPassword(data: ForgotPasswordRequest): Promise<void> {
+export async function forgotPassword(
+  data: ForgotPasswordRequest,
+): Promise<void> {
   const user = await prisma.user.findUnique({
-    where: { 
+    where: {
       email: data.email,
-      deleted_at: null 
-    }
+      deleted_at: null,
+    },
   });
 
   if (!user) {
     return;
   }
 
-  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetToken = crypto.randomBytes(32).toString("hex");
   const resetTokenExpires = new Date(Date.now() + 3600000);
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
       reset_token: resetToken,
-      reset_token_expires: resetTokenExpires
-    }
+      reset_token_expires: resetTokenExpires,
+    },
   });
 
   console.log(`Password reset token for ${user.email}: ${resetToken}`);
@@ -194,13 +205,13 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<void> {
     where: {
       reset_token: data.token,
       reset_token_expires: {
-        gt: new Date()
+        gt: new Date(),
       },
-      deleted_at: null
-    }
+      deleted_at: null,
+    },
   });
 
-  if (!user) throw new Error('Invalid or expired reset token');
+  if (!user) throw new Error("Invalid or expired reset token");
 
   const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
 
@@ -209,12 +220,15 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<void> {
     data: {
       password_hash: passwordHash,
       reset_token: null,
-      reset_token_expires: null
-    }
+      reset_token_expires: null,
+    },
   });
 }
 
-export async function updateProfile(userId: number, data: UpdateProfileRequest): Promise<UserProfile> {
+export async function updateProfile(
+  userId: number,
+  data: UpdateProfileRequest,
+): Promise<UserProfile> {
   const updateData: Record<string, unknown> = {};
 
   if (data.name !== undefined) {
@@ -223,14 +237,14 @@ export async function updateProfile(userId: number, data: UpdateProfileRequest):
 
   if (data.email !== undefined) {
     const existingUser = await prisma.user.findUnique({
-      where: { 
+      where: {
         email: data.email,
-        deleted_at: null
-      }
+        deleted_at: null,
+      },
     });
 
     if (existingUser && existingUser.id !== userId) {
-      throw new Error('Email already in use');
+      throw new Error("Email already in use");
     }
 
     updateData.email = data.email;
@@ -241,15 +255,15 @@ export async function updateProfile(userId: number, data: UpdateProfileRequest):
   }
 
   if (Object.keys(updateData).length === 0) {
-    throw new Error('No fields to update');
+    throw new Error("No fields to update");
   }
 
   updateData.updated_at = new Date();
 
   const user = await prisma.user.update({
-    where: { 
+    where: {
       id: userId,
-      deleted_at: null
+      deleted_at: null,
     },
     data: updateData,
   });
@@ -257,11 +271,11 @@ export async function updateProfile(userId: number, data: UpdateProfileRequest):
   const entity = await prisma.entity.findUnique({
     where: {
       id: user.entity_id,
-      deleted_at: null
-    }
+      deleted_at: null,
+    },
   });
 
-  if (!entity) throw new Error('Entity not found');
+  if (!entity) throw new Error("Entity not found");
 
   return {
     id: user.id.toString(),

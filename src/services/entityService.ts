@@ -1,15 +1,15 @@
-import prisma from '../lib/prisma';
+import prisma from "../lib/prisma";
 
 export async function getEntityById(id: number) {
   return prisma.entity.findUnique({
-    where: { 
+    where: {
       id,
-      deleted_at: null
-    }
+      deleted_at: null,
+    },
   });
 }
 
 export async function validateEntityExists(entityId: number): Promise<boolean> {
   const entity = await getEntityById(entityId);
   return !!entity;
-} 
+}

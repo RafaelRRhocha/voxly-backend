@@ -1,12 +1,14 @@
-import prisma from '../lib/prisma';
-import bcrypt from 'bcrypt';
-import { UserCreate, UserUpdate, UserResponse } from '../types/user';
-import * as entityService from './entityService';
+import bcrypt from "bcrypt";
+
+import prisma from "../lib/prisma";
+import { UserCreate, UserResponse, UserUpdate } from "../types/user";
+
+import * as entityService from "./entityService";
 
 export async function createUser(data: UserCreate): Promise<UserResponse> {
   const entityExists = await entityService.validateEntityExists(data.entity_id);
   if (!entityExists) {
-    throw new Error('Entity not found');
+    throw new Error("Entity not found");
   }
 
   const hashed = await bcrypt.hash(data.password, 10);
@@ -26,7 +28,7 @@ export async function createUser(data: UserCreate): Promise<UserResponse> {
   });
 
   if (!entity) {
-    throw new Error('Entity not found');
+    throw new Error("Entity not found");
   }
 
   return {
@@ -53,7 +55,7 @@ export async function getUserById(id: number): Promise<UserResponse | null> {
   });
 
   if (!entity) {
-    throw new Error('Entity not found');
+    throw new Error("Entity not found");
   }
 
   return {
@@ -68,16 +70,18 @@ export async function getUserById(id: number): Promise<UserResponse | null> {
   };
 }
 
-export async function getUsersByEntityId(entityId: number): Promise<UserResponse[]> {
+export async function getUsersByEntityId(
+  entityId: number,
+): Promise<Array<UserResponse>> {
   const entityExists = await entityService.validateEntityExists(entityId);
   if (!entityExists) {
-    throw new Error('Entity not found');
+    throw new Error("Entity not found");
   }
 
   const users = await prisma.user.findMany({
-    where: { 
+    where: {
       entity_id: entityId,
-      deleted_at: null
+      deleted_at: null,
     },
   });
 
@@ -86,10 +90,10 @@ export async function getUsersByEntityId(entityId: number): Promise<UserResponse
   });
 
   if (!entity) {
-    throw new Error('Entity not found');
+    throw new Error("Entity not found");
   }
 
-  return users.map(user => ({
+  return users.map((user) => ({
     id: user.id,
     name: user.name,
     email: user.email,
@@ -103,17 +107,19 @@ export async function getUsersByEntityId(entityId: number): Promise<UserResponse
 
 export async function updateUser(
   id: number,
-  data: UserUpdate
+  data: UserUpdate,
 ): Promise<UserResponse> {
   const updateData: Record<string, unknown> = { ...data };
-  
+
   if (data.entity_id) {
-    const entityExists = await entityService.validateEntityExists(data.entity_id);
+    const entityExists = await entityService.validateEntityExists(
+      data.entity_id,
+    );
     if (!entityExists) {
-      throw new Error('Entity not found');
+      throw new Error("Entity not found");
     }
   }
-  
+
   if (data.password) {
     updateData.password_hash = await bcrypt.hash(data.password, 10);
     delete updateData.password;
@@ -132,7 +138,7 @@ export async function updateUser(
   });
 
   if (!entity) {
-    throw new Error('Entity not found');
+    throw new Error("Entity not found");
   }
 
   return {
@@ -154,4 +160,4 @@ export async function deleteUser(id: number): Promise<void> {
       deleted_at: new Date(),
     },
   });
-} 
+}

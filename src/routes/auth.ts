@@ -1,20 +1,21 @@
-import { Router } from 'express';
-import { 
-  login, 
-  profile, 
-  refreshToken, 
-  forgotPassword, 
+import { Router } from "express";
+
+import {
+  forgotPassword,
+  login,
+  profile,
+  refreshToken,
   resetPassword,
-  updateProfile 
-} from '../controllers/authController';
-import { authenticate } from '../middlewares/authMiddleware';
-import { 
-  validateLogin, 
-  validateRefreshToken, 
-  validateForgotPassword, 
+  updateProfile,
+} from "../controllers/authController";
+import { authenticate } from "../middlewares/authMiddleware";
+import {
+  validateForgotPassword,
+  validateLogin,
+  validateRefreshToken,
   validateResetPassword,
-  validateUpdateProfile 
-} from '../middlewares/validationMiddleware';
+  validateUpdateProfile,
+} from "../middlewares/validationMiddleware";
 
 const router = Router();
 
@@ -79,7 +80,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/profile', authenticate, profile);
+router.get("/profile", authenticate, profile);
 
 /**
  * @swagger
@@ -136,7 +137,7 @@ router.get('/profile', authenticate, profile);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/profile', authenticate, validateUpdateProfile, updateProfile);
+router.put("/profile", authenticate, validateUpdateProfile, updateProfile);
 
 /**
  * @swagger
@@ -176,7 +177,7 @@ router.put('/profile', authenticate, validateUpdateProfile, updateProfile);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/login', validateLogin, login);
+router.post("/login", validateLogin, login);
 
 /**
  * @swagger
@@ -211,7 +212,7 @@ router.post('/login', validateLogin, login);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/refresh', validateRefreshToken, refreshToken);
+router.post("/refresh", validateRefreshToken, refreshToken);
 
 /**
  * @swagger
@@ -242,7 +243,7 @@ router.post('/refresh', validateRefreshToken, refreshToken);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/forgot-password', validateForgotPassword, forgotPassword);
+router.post("/forgot-password", validateForgotPassword, forgotPassword);
 
 /**
  * @swagger
@@ -277,6 +278,6 @@ router.post('/forgot-password', validateForgotPassword, forgotPassword);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/reset-password', validateResetPassword, resetPassword);
+router.post("/reset-password", validateResetPassword, resetPassword);
 
 export default router;

@@ -1,19 +1,25 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { JwtPayload } from '../types/auth';
-import { UserRole } from '../enums/user';
-import '../types/express';
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+import { UserRole } from "../enums/user";
+import { JwtPayload } from "../types/auth";
 
-export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
+import "../types/express";
+
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
+
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
   const auth = req.headers.authorization;
   if (!auth) {
-    res.status(401).json({ error: 'Token missing' });
+    res.status(401).json({ error: "Token missing" });
     return;
   }
 
-  const token = auth.split(' ')[1];
+  const token = auth.split(" ")[1];
   try {
     const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
@@ -24,14 +30,14 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     };
     next();
   } catch {
-    res.status(403).json({ error: 'Invalid token' });
+    res.status(403).json({ error: "Invalid token" });
   }
 };
 
 export const requireRole = (role: UserRole) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user || req.user.role !== role) {
-      res.status(403).json({ error: 'Access restricted' });
+      res.status(403).json({ error: "Access restricted" });
       return;
     }
     next();

@@ -1,4 +1,4 @@
-import { Entity as PrismaEntity } from '@prisma/client';
+import { Entity as PrismaEntity } from "@prisma/client";
 
 export interface EntityCreate {
   name: string;
@@ -15,4 +15,4 @@ export interface EntityResponse {
   updated_at: Date | null;
 }
 
-export type Entity = PrismaEntity; 
+export type Entity = PrismaEntity;

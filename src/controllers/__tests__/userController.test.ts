@@ -1,10 +1,11 @@
-import { Request, Response } from 'express';
-import * as userService from '../../services/userService';
-import { UserRole } from '../../enums/user';
-import { UserResponse, UserCreate, UserUpdate } from '../../types/user';
-import * as userController from '../userController';
+import { Request, Response } from "express";
 
-jest.mock('../../services/userService');
+import { UserRole } from "../../enums/user";
+import * as userService from "../../services/userService";
+import { UserCreate, UserResponse, UserUpdate } from "../../types/user";
+import * as userController from "../userController";
+
+jest.mock("../../services/userService");
 
 interface RequestWithUser extends Request {
   user?: {
@@ -14,7 +15,7 @@ interface RequestWithUser extends Request {
   };
 }
 
-describe('UserController', () => {
+describe("UserController", () => {
   let mockRequest: Partial<Request & RequestWithUser>;
   let mockResponse: Partial<Response>;
 
@@ -24,7 +25,7 @@ describe('UserController', () => {
       body: {},
       query: {},
     };
-    
+
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -34,204 +35,239 @@ describe('UserController', () => {
     jest.clearAllMocks();
   });
 
-  describe('register', () => {
-    it('should create a user successfully', async () => {
+  describe("register", () => {
+    it("should create a user successfully", async () => {
       const userData: UserCreate = {
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'password123',
+        name: "Test User",
+        email: "test@example.com",
+        password: "password123",
         entity_id: 1,
         role: UserRole.SELLER,
       };
 
       const createdUser: UserResponse = {
         id: 1,
-        name: 'Test User',
-        email: 'test@example.com',
+        name: "Test User",
+        email: "test@example.com",
         entityId: 1,
-        entityName: 'Test Entity',
+        entityName: "Test Entity",
         role: UserRole.SELLER,
         created_at: new Date(),
         updated_at: null,
       };
 
       mockRequest.body = userData;
-      jest.spyOn(userService, 'createUser').mockResolvedValue(createdUser);
+      jest.spyOn(userService, "createUser").mockResolvedValue(createdUser);
 
-      await userController.register(mockRequest as Request, mockResponse as Response);
+      await userController.register(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(userService.createUser).toHaveBeenCalledWith(userData);
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith(createdUser);
     });
 
-    it('should return 400 when required fields are missing', async () => {
-      mockRequest.body = { email: 'test@example.com' };
+    it("should return 400 when required fields are missing", async () => {
+      mockRequest.body = { email: "test@example.com" };
 
-      await userController.register(mockRequest as Request, mockResponse as Response);
+      await userController.register(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Required fields: name, email, password, entity_id'
+        error: "Required fields: name, email, password, entity_id",
       });
     });
 
-    it('should return 409 when email is already in use', async () => {
+    it("should return 409 when email is already in use", async () => {
       const userData: UserCreate = {
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'password123',
+        name: "Test User",
+        email: "test@example.com",
+        password: "password123",
         entity_id: 1,
         role: UserRole.SELLER,
       };
 
       mockRequest.body = userData;
-      const error = new Error('Unique constraint');
-      jest.spyOn(userService, 'createUser').mockRejectedValue(error);
+      const error = new Error("Unique constraint");
+      jest.spyOn(userService, "createUser").mockRejectedValue(error);
 
-      await userController.register(mockRequest as Request, mockResponse as Response);
+      await userController.register(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(409);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'Email already in use'
+        error: "Email already in use",
       });
     });
   });
 
-  describe('getUserById', () => {
-    it('should return user when found', async () => {
+  describe("getUserById", () => {
+    it("should return user when found", async () => {
       const user: UserResponse = {
         id: 1,
-        name: 'Test User',
-        email: 'test@example.com',
+        name: "Test User",
+        email: "test@example.com",
         entityId: 1,
-        entityName: 'Test Entity',
+        entityName: "Test Entity",
         role: UserRole.SELLER,
         created_at: new Date(),
         updated_at: null,
       };
 
-      mockRequest.params = { id: '1' };
-      jest.spyOn(userService, 'getUserById').mockResolvedValue(user);
+      mockRequest.params = { id: "1" };
+      jest.spyOn(userService, "getUserById").mockResolvedValue(user);
 
-      await userController.getUserById(mockRequest as Request, mockResponse as Response);
+      await userController.getUserById(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(userService.getUserById).toHaveBeenCalledWith(1);
       expect(mockResponse.json).toHaveBeenCalledWith(user);
     });
 
-    it('should return 404 when user is not found', async () => {
-      mockRequest.params = { id: '1' };
-      jest.spyOn(userService, 'getUserById').mockResolvedValue(null);
+    it("should return 404 when user is not found", async () => {
+      mockRequest.params = { id: "1" };
+      jest.spyOn(userService, "getUserById").mockResolvedValue(null);
 
-      await userController.getUserById(mockRequest as Request, mockResponse as Response);
+      await userController.getUserById(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(404);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'User not found'
+        error: "User not found",
       });
     });
   });
 
-  describe('listUsersByEntity', () => {
-    it('should return users when entity_id is provided in query', async () => {
-      const users: UserResponse[] = [{
-        id: 1,
-        name: 'Test User',
-        email: 'test@example.com',
-        entityId: 1,
-        entityName: 'Test Entity',
-        role: UserRole.SELLER,
-        created_at: new Date(),
-        updated_at: null,
-      }];
+  describe("listUsersByEntity", () => {
+    it("should return users when entity_id is provided in query", async () => {
+      const users: Array<UserResponse> = [
+        {
+          id: 1,
+          name: "Test User",
+          email: "test@example.com",
+          entityId: 1,
+          entityName: "Test Entity",
+          role: UserRole.SELLER,
+          created_at: new Date(),
+          updated_at: null,
+        },
+      ];
 
-      mockRequest.query = { entity_id: '1' };
-      jest.spyOn(userService, 'getUsersByEntityId').mockResolvedValue(users);
+      mockRequest.query = { entity_id: "1" };
+      jest.spyOn(userService, "getUsersByEntityId").mockResolvedValue(users);
 
-      await userController.listUsersByEntity(mockRequest as RequestWithUser, mockResponse as Response);
+      await userController.listUsersByEntity(
+        mockRequest as RequestWithUser,
+        mockResponse as Response,
+      );
 
       expect(userService.getUsersByEntityId).toHaveBeenCalledWith(1);
       expect(mockResponse.json).toHaveBeenCalledWith(users);
     });
 
-    it('should return 400 when entity_id is missing', async () => {
+    it("should return 400 when entity_id is missing", async () => {
       mockRequest.query = {};
       mockRequest.user = undefined;
 
-      await userController.listUsersByEntity(mockRequest as RequestWithUser, mockResponse as Response);
+      await userController.listUsersByEntity(
+        mockRequest as RequestWithUser,
+        mockResponse as Response,
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'entity_id is required'
+        error: "entity_id is required",
       });
     });
   });
 
-  describe('updateUser', () => {
-    it('should update user successfully', async () => {
+  describe("updateUser", () => {
+    it("should update user successfully", async () => {
       const updateData: UserUpdate = {
-        email: 'updated@example.com',
+        email: "updated@example.com",
         role: UserRole.MANAGER,
       };
 
       const updatedUser: UserResponse = {
         id: 1,
-        name: 'Test User',
-        email: 'updated@example.com',
+        name: "Test User",
+        email: "updated@example.com",
         entityId: 1,
-        entityName: 'Test Entity',
+        entityName: "Test Entity",
         role: UserRole.MANAGER,
         created_at: new Date(),
         updated_at: new Date(),
       };
 
-      mockRequest.params = { id: '1' };
+      mockRequest.params = { id: "1" };
       mockRequest.body = updateData;
-      jest.spyOn(userService, 'updateUser').mockResolvedValue(updatedUser);
+      jest.spyOn(userService, "updateUser").mockResolvedValue(updatedUser);
 
-      await userController.updateUser(mockRequest as Request, mockResponse as Response);
+      await userController.updateUser(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(userService.updateUser).toHaveBeenCalledWith(1, updateData);
       expect(mockResponse.json).toHaveBeenCalledWith(updatedUser);
     });
 
-    it('should return 400 when trying to update entity_id', async () => {
-      mockRequest.params = { id: '1' };
+    it("should return 400 when trying to update entity_id", async () => {
+      mockRequest.params = { id: "1" };
       mockRequest.body = { entity_id: 2 };
 
-      await userController.updateUser(mockRequest as Request, mockResponse as Response);
+      await userController.updateUser(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'It is not allowed to change the user\'s entity'
+        error: "It is not allowed to change the user's entity",
       });
     });
   });
 
-  describe('deleteUser', () => {
-    it('should delete user successfully', async () => {
-      mockRequest.params = { id: '1' };
-      jest.spyOn(userService, 'deleteUser').mockResolvedValue(undefined);
+  describe("deleteUser", () => {
+    it("should delete user successfully", async () => {
+      mockRequest.params = { id: "1" };
+      jest.spyOn(userService, "deleteUser").mockResolvedValue(undefined);
 
-      await userController.deleteUser(mockRequest as Request, mockResponse as Response);
+      await userController.deleteUser(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(userService.deleteUser).toHaveBeenCalledWith(1);
       expect(mockResponse.status).toHaveBeenCalledWith(204);
       expect(mockResponse.send).toHaveBeenCalled();
     });
 
-    it('should return 404 when user is not found', async () => {
-      mockRequest.params = { id: '1' };
-      const error = new Error('Record to update not found');
-      jest.spyOn(userService, 'deleteUser').mockRejectedValue(error);
+    it("should return 404 when user is not found", async () => {
+      mockRequest.params = { id: "1" };
+      const error = new Error("Record to update not found");
+      jest.spyOn(userService, "deleteUser").mockRejectedValue(error);
 
-      await userController.deleteUser(mockRequest as Request, mockResponse as Response);
+      await userController.deleteUser(
+        mockRequest as Request,
+        mockResponse as Response,
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(404);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: 'User not found'
+        error: "User not found",
       });
     });
   });
-}); 
+});

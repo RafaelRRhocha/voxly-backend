@@ -1,5 +1,4 @@
-import { Request } from 'express';
-import { UserRole } from '../enums/user';
+import { UserRole } from "../enums/user";
 
 export interface AuthenticatedUser {
   id: number;

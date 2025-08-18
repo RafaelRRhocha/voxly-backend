@@ -1,5 +1,6 @@
-import { User as PrismaUser } from '@prisma/client';
-import { UserRole } from '../enums/user';
+import { User as PrismaUser } from "@prisma/client";
+
+import { UserRole } from "../enums/user";
 
 export interface UserCreate {
   name: string;
@@ -28,4 +29,4 @@ export interface UserResponse {
   updated_at: Date | null;
 }
 
-export type User = Omit<PrismaUser, 'password_hash'>;
+export type User = Omit<PrismaUser, "password_hash">;
