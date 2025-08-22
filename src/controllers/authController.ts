@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import * as authService from "../services/authService";
 import {
-  ForgotPasswordRequest,
   LoginRequest,
   RefreshTokenRequest,
   ResetPasswordRequest,
@@ -47,27 +46,14 @@ export const refreshToken = async (
   }
 };
 
-export const forgotPassword = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const forgotData: ForgotPasswordRequest = req.body;
-    await authService.forgotPassword(forgotData);
-    res.status(204).send();
-  } catch (err) {
-    res.status(400).json({ error: (err as Error).message });
-  }
-};
-
 export const resetPassword = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     const resetData: ResetPasswordRequest = req.body;
-    await authService.resetPassword(resetData);
-    res.status(204).send();
+    const result = await authService.resetPassword(resetData);
+    res.json(result);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
   }

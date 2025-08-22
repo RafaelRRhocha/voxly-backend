@@ -1,11 +1,9 @@
 import bcrypt from "bcrypt";
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
 import { UserRole } from "../enums/user";
 import prisma from "../lib/prisma";
 import {
-  ForgotPasswordRequest,
   JwtPayload,
   LoginRequest,
   LoginResponse,
@@ -172,9 +170,9 @@ export async function refreshToken(
   };
 }
 
-export async function forgotPassword(
-  data: ForgotPasswordRequest,
-): Promise<void> {
+export async function resetPassword(
+  data: ResetPasswordRequest,
+): Promise<{ email: string }> {
   const user = await prisma.user.findUnique({
     where: {
       email: data.email,
@@ -182,36 +180,7 @@ export async function forgotPassword(
     },
   });
 
-  if (!user) {
-    return;
-  }
-
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  const resetTokenExpires = new Date(Date.now() + 3600000);
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      reset_token: resetToken,
-      reset_token_expires: resetTokenExpires,
-    },
-  });
-
-  console.log(`Password reset token for ${user.email}: ${resetToken}`);
-}
-
-export async function resetPassword(data: ResetPasswordRequest): Promise<void> {
-  const user = await prisma.user.findFirst({
-    where: {
-      reset_token: data.token,
-      reset_token_expires: {
-        gt: new Date(),
-      },
-      deleted_at: null,
-    },
-  });
-
-  if (!user) throw new Error("Invalid or expired reset token");
+  if (!user) throw new Error("User not found");
 
   const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
 
@@ -219,10 +188,11 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<void> {
     where: { id: user.id },
     data: {
       password_hash: passwordHash,
-      reset_token: null,
-      reset_token_expires: null,
+      updated_at: new Date(),
     },
   });
+
+  return { email: data.email };
 }
 
 export async function updateProfile(

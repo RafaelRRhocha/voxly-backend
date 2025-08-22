@@ -1,7 +1,6 @@
 import { Router } from "express";
 
 import {
-  forgotPassword,
   login,
   profile,
   refreshToken,
@@ -10,7 +9,6 @@ import {
 } from "../controllers/authController";
 import { authenticate } from "../middlewares/authMiddleware";
 import {
-  validateForgotPassword,
   validateLogin,
   validateRefreshToken,
   validateResetPassword,
@@ -216,9 +214,9 @@ router.post("/refresh", validateRefreshToken, refreshToken);
 
 /**
  * @swagger
- * /api/auth/forgot-password:
+ * /api/auth/reset-password:
  *   post:
- *     summary: Initiate password recovery process
+ *     summary: Reset user password
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -228,51 +226,30 @@ router.post("/refresh", validateRefreshToken, refreshToken);
  *             type: object
  *             required:
  *               - email
+ *               - password
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
  *                 description: User email
- *     responses:
- *       204:
- *         description: Password reset email sent (or user not found)
- *       400:
- *         description: Invalid request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.post("/forgot-password", validateForgotPassword, forgotPassword);
-
-/**
- * @swagger
- * /api/auth/reset-password:
- *   post:
- *     summary: Set new password after recovery process
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - token
- *               - password
- *             properties:
- *               token:
- *                 type: string
- *                 description: Password reset token
  *               password:
  *                 type: string
  *                 format: password
  *                 description: New password
  *     responses:
- *       204:
+ *       200:
  *         description: Password reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                   description: User email
  *       400:
- *         description: Invalid or expired token
+ *         description: User not found or invalid data
  *         content:
  *           application/json:
  *             schema:

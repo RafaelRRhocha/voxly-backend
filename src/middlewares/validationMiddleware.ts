@@ -91,12 +91,8 @@ export const validateRefreshToken = validateRequest([
   { field: "email", required: true, type: "email" },
 ]);
 
-export const validateForgotPassword = validateRequest([
-  { field: "email", required: true, type: "email" },
-]);
-
 export const validateResetPassword = validateRequest([
-  { field: "token", required: true, type: "string", minLength: 1 },
+  { field: "email", required: true, type: "email" },
   { field: "password", required: true, type: "string", minLength: 6 },
 ]);
 

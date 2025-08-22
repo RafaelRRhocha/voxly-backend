@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { UserRole } from "../../enums/user";
 import * as authService from "../../services/authService";
 import {
-  ForgotPasswordRequest,
   LoginRequest,
   LoginResponse,
   RefreshTokenRequest,
@@ -46,7 +45,13 @@ describe("AuthController", () => {
       };
 
       const loginResponse: LoginResponse = {
-        user: { id: "1", email: "test@example.com", name: "Test User" },
+        user: {
+          id: "1",
+          email: "test@example.com",
+          name: "Test User",
+          role: UserRole.SELLER,
+          entityId: 1,
+        },
         token: "jwt-token",
       };
 
@@ -254,7 +259,13 @@ describe("AuthController", () => {
       };
 
       const refreshResponse: LoginResponse = {
-        user: { id: "1", email: "test@example.com", name: "Test User" },
+        user: {
+          id: "1",
+          email: "test@example.com",
+          name: "Test User",
+          role: UserRole.SELLER,
+          entityId: 1,
+        },
         token: "new-jwt-token",
       };
 
@@ -273,35 +284,17 @@ describe("AuthController", () => {
     });
   });
 
-  describe("forgotPassword", () => {
-    it("should send forgot password email successfully", async () => {
-      const forgotData: ForgotPasswordRequest = {
-        email: "test@example.com",
-      };
-
-      mockRequest.body = forgotData;
-      jest.spyOn(authService, "forgotPassword").mockResolvedValue();
-
-      await authController.forgotPassword(
-        mockRequest as Request,
-        mockResponse as Response,
-      );
-
-      expect(authService.forgotPassword).toHaveBeenCalledWith(forgotData);
-      expect(mockResponse.status).toHaveBeenCalledWith(204);
-      expect(mockSend).toHaveBeenCalled();
-    });
-  });
-
   describe("resetPassword", () => {
     it("should reset password successfully", async () => {
       const resetData: ResetPasswordRequest = {
-        token: "reset-token",
+        email: "test@example.com",
         password: "newpassword123",
       };
 
+      const resetResponse = { email: "test@example.com" };
+
       mockRequest.body = resetData;
-      jest.spyOn(authService, "resetPassword").mockResolvedValue();
+      jest.spyOn(authService, "resetPassword").mockResolvedValue(resetResponse);
 
       await authController.resetPassword(
         mockRequest as Request,
@@ -309,18 +302,17 @@ describe("AuthController", () => {
       );
 
       expect(authService.resetPassword).toHaveBeenCalledWith(resetData);
-      expect(mockResponse.status).toHaveBeenCalledWith(204);
-      expect(mockSend).toHaveBeenCalled();
+      expect(mockResponse.json).toHaveBeenCalledWith(resetResponse);
     });
 
     it("should return 400 when reset fails", async () => {
       const resetData: ResetPasswordRequest = {
-        token: "invalid-token",
+        email: "nonexistent@example.com",
         password: "newpassword123",
       };
 
       mockRequest.body = resetData;
-      const error = new Error("Invalid or expired reset token");
+      const error = new Error("User not found");
       jest.spyOn(authService, "resetPassword").mockRejectedValue(error);
 
       await authController.resetPassword(
@@ -331,7 +323,7 @@ describe("AuthController", () => {
       expect(authService.resetPassword).toHaveBeenCalledWith(resetData);
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: "Invalid or expired reset token",
+        error: "User not found",
       });
     });
   });
