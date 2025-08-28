@@ -107,3 +107,24 @@ export const validateUpdateProfile = validateRequest([
   { field: "email", required: false, type: "email" },
   { field: "password", required: false, type: "string", minLength: 6 },
 ]);
+
+export const validateStoreCreate = validateRequest([
+  {
+    field: "name",
+    required: true,
+    type: "string",
+    minLength: 1,
+    maxLength: 100,
+  },
+  { field: "entity_id", required: true },
+]);
+
+export const validateStoreUpdate = validateRequest([
+  {
+    field: "name",
+    required: false,
+    type: "string",
+    minLength: 1,
+    maxLength: 100,
+  },
+]);

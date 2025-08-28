@@ -57,7 +57,7 @@ model User {
 model Store {
   id         Int       @id @default(autoincrement())
   entity_id  Int
-  name       String    @unique
+  name       String
   created_at DateTime  @default(now())
   updated_at DateTime?
   deleted_at DateTime?
@@ -66,6 +66,7 @@ model Store {
 
   sellers Seller[]
 
+  @@unique([entity_id, name])
   @@map("stores")
 }
 
