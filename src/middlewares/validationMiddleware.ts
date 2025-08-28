@@ -128,3 +128,26 @@ export const validateStoreUpdate = validateRequest([
     maxLength: 100,
   },
 ]);
+
+export const validateSellerCreate = validateRequest([
+  {
+    field: "name",
+    required: true,
+    type: "string",
+    minLength: 1,
+    maxLength: 100,
+  },
+  { field: "email", required: true, type: "email" },
+  { field: "store_id", required: true },
+]);
+
+export const validateSellerUpdate = validateRequest([
+  {
+    field: "name",
+    required: false,
+    type: "string",
+    minLength: 1,
+    maxLength: 100,
+  },
+  { field: "email", required: false, type: "email" },
+]);
